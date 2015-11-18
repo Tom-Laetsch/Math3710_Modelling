@@ -1,8 +1,10 @@
-function [lowM, relerr] = lower_rank(M,rk)
+function [lowM, ornk, relerr] = lower_rank(M,irnk)
   
   #dimensions of the image matrix
   [m,n] = size(M);
-  len = max(1,min(rk, min([m,n])-1));
+  
+  #make sure the approximation rank is reasonable
+  ornk = max(1,min(irnk, rank(M)-1));
   
   [L,S,R] = svd(M);
   
@@ -10,13 +12,13 @@ function [lowM, relerr] = lower_rank(M,rk)
   lowM = zeros(m,n);
   
   #create the lower rank matrix
-  lowM = L(:,1:len) * S(1:len,1:len) * R(:,1:len)';
+  lowM = L(:,1:ornk) * S(1:ornk,1:ornk) * R(:,1:ornk)';
     
   #Calculate the relative error
   sigmas = diag(S);
-  relerr = sqrt(sum(sigmas(len+1:end) .^ 2)/sum(sigmas .^ 2));
+  relerr = sqrt(sum(sigmas(ornk+1:end) .^ 2)/sum(sigmas .^ 2));
   
   #display the relative error of lower rank approximation
-  disp(sprintf("Rank %d Approximation Relative Error: %.6f.",len,relerr));
+  disp(sprintf("Rank %d Approximation Relative Error: %.6f.",ornk,relerr));
   
 end
